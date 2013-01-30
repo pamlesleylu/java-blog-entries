@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		   http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd
+		http://www.springframework.org/schema/data/jpa
+		http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+		http://www.springframework.org/schema/util
+          http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="org.postgresql.Driver" />
+		<property name="jdbcUrl" value="jdbc:postgresql://localhost:5432/sample" />
+		<property name="user" value="admin" />
+		<property name="password" value="qwerty" />
+
+		<property name="minPoolSize" value="10" />
+		<property name="maxPoolSize" value="100" />
+		<property name="maxStatements" value="0" />
+		<property name="acquireIncrement" value="5" />
+		<property name="idleConnectionTestPeriod" value="100" />
+	</bean>
+
+	<!-- JPA configuration -->
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
+		<property name="packagesToScan" value="com.plu.domain" />
+		<property name="jpaPropertyMap" ref="hibernateProperties" />
+
+		<property name="loadTimeWeaver">
+			<bean
+				class="org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver" />
+		</property>
+	</bean>
+
+	<bean id="hibernateJpaVendorAdapter"
+		class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+
+	<util:map id="hibernateProperties">
+
+		<!-- The classname of a Hibernate org.hibernate.dialect.Dialect which allows 
+			Hibernate to generate SQL optimized for a particular relational database. -->
+		<entry key="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
+
+		<!-- Write all SQL statements to console. This is an alternative to setting 
+			the log category org.hibernate.SQL to debug. -->
+		<entry key="hibernate.show_sql" value="true" />
+
+		<!-- Pretty print the SQL in the log and console. -->
+		<entry key="hibernate.format_sql" value="true" />
+
+		<!-- If turned on, Hibernate will generate comments inside the SQL, for 
+			easier debugging, defaults to false. -->
+		<entry key="hibernate.use_sql_comments" value="true" />
+
+		<!-- If enabled, Hibernate will collect statistics useful for performance 
+			tuning. -->
+		<entry key="hibernate.generate_statistics" value="true" />
+
+		<!-- Automatically validates or exports schema DDL to the database when 
+			the SessionFactory is created. With create-drop, the database schema will 
+			be dropped when the SessionFactory is closed explicitly. e.g. validate | 
+			update | create | create-drop -->
+		<entry key="hibernate.hbm2ddl.auto" value="create-drop" />
+	</util:map>
+
+	<!-- transaction management -->
+	<bean name="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+
+	<context:annotation-config />
+	<context:component-scan base-package="com.plu" />
+	<aop:aspectj-autoproxy />
+
+	<jpa:repositories base-package="com.plu.repository" />
+
+	<bean name="app" class="com.plu.App"></bean>
+
+
+</beans>

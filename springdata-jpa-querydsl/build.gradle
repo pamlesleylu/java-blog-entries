@@ -1,0 +1,99 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+version = '1.0'
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Quickstart', 'Implementation-Version': version
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+	generated
+}
+sourceSets.generated.java.srcDirs = ['src/main/generated']
+
+project.ext {
+	springVersion = '3.2.0.RELEASE'
+	hibernateVersion = '4.1.9.Final'
+	
+}
+
+dependencies {
+    compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+    compile group: 'org.springframework', name: 'spring-core', version: project.springVersion
+    compile group: 'org.springframework', name: 'spring-expression', version: project.springVersion
+    compile group: 'org.springframework', name: 'spring-beans', version: project.springVersion
+    compile group: 'org.springframework', name: 'spring-aop', version: project.springVersion
+    compile group: 'org.springframework', name: 'spring-context', version: project.springVersion
+    compile group: 'org.springframework', name: 'spring-tx', version: project.springVersion
+    compile group: 'org.springframework', name: 'spring-jdbc', version: project.springVersion
+    compile group: 'org.springframework', name: 'spring-orm', version: project.springVersion
+    compile group: 'org.hibernate', name: 'hibernate-core', version: project.hibernateVersion
+    compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: project.hibernateVersion
+    compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.0-api', version: '1.0.1.Final'
+    //compile group: 'org.hibernate', name: 'hiberanate-c3p0', version: '4.1.8.Final'
+    compile group: 'c3p0', name: 'c3p0', version: '0.9.1.2'
+    compile group: 'postgresql', name: 'postgresql', version: '9.0-801.jdbc4'
+    compile group: 'org.springframework.data', name: 'spring-data-jpa', version: '1.0.2.RELEASE'
+    
+    compile(group: 'com.mysema.querydsl', name: 'querydsl-core', version: '2.9.0')
+    compile(group: 'com.mysema.querydsl', name: 'querydsl-apt', version: '2.9.0')
+   	compile(group: 'com.mysema.querydsl', name: 'querydsl-jpa', version: '2.9.0')
+
+   	compile(group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.6.1')
+    
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+    testCompile group: 'org.springframework', name: 'spring-test', version: springVersion
+}
+
+compileJava {
+
+    doFirst {
+    	destDir = file('build/classes/main')
+    	destDir.mkdirs()
+    
+		def sourceDir = ''
+		sourceSets.generated.java.srcDirs.each { file -> 
+		  sourceDir = file.getAbsolutePath()
+		}
+
+      	Map otherArgs = [
+            includeAntRuntime: false,
+            destdir: destinationDir,
+            classpath: configurations.compile.asPath,
+            sourcepath: '',
+            target: targetCompatibility,
+            source: sourceCompatibility
+        ]
+        options.compilerArgs = [
+            '-processor', 'com.mysema.query.apt.jpa.JPAAnnotationProcessor',
+            '-s', sourceDir
+        ]
+        Map antOptions = otherArgs + options.optionMap()
+        ant.javac(antOptions) {
+            source.addToAntBuilder(ant, 'src', FileCollection.AntType.MatchingTask)
+            options.compilerArgs.each {value ->
+                compilerarg(value: value)
+            }
+        } 
+    } 
+}
+
+test {
+    systemProperties 'property': 'value'
+}
+
+uploadArchives {
+    repositories {
+       flatDir {
+           dirs 'repos'
+       }
+    }
+}
