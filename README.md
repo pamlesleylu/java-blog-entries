@@ -1,1 +1,1 @@
-###Code snippets from my blog (pamlesleylu.wordpress.com)
+###Code snippets from [my blog](http://pamlesleylu.wordpress.com/)
