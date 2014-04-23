@@ -1,4 +1,4 @@
-Code for My Java Blog Entries
-=============================
+Content-Based Router in SwitchYard using Camel
+==============================================
 
-This repository contains the Java code snippets for [my blog](http://pamlesleylu.wordpress.com/) entries.
+Code used for [this post](http://pamlesleylu.wordpress.com/2014/02/09/content-based-router-in-switchyard-using-camel/).
