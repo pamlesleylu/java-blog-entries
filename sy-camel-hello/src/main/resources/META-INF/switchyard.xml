@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<switchyard xmlns="urn:switchyard-config:switchyard:1.0" xmlns:camel="urn:switchyard-component-camel:config:1.0" xmlns:http="urn:switchyard-component-http:config:1.0" xmlns:sca="http://docs.oasis-open.org/ns/opencsa/sca/200912" name="sy-camel-hello" targetNamespace="urn:com.sy.camel:hello:1.0">
+  <sca:composite name="sy-camel-hello" targetNamespace="urn:com.sy.camel:hello:1.0">
+    <sca:component name="CamelServiceRoute">
+      <camel:implementation.camel>
+        <camel:java class="com.sy.camel.hello.CamelServiceRoute"/>
+      </camel:implementation.camel>
+      <sca:service name="HelloService">
+        <sca:interface.java interface="com.sy.camel.hello.HelloService"/>
+      </sca:service>
+    </sca:component>
+    <sca:service name="HelloService" promote="CamelServiceRoute/HelloService">
+      <sca:interface.java interface="com.sy.camel.hello.HelloService"/>
+      <http:binding.http name="helloHttp">
+        <http:contextPath>http/hello</http:contextPath>
+        <http:method>POST</http:method>
+      </http:binding.http>
+    </sca:service>
+  </sca:composite>
+</switchyard>
